@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="sidebar" id="sidebar" class="shadow">
+    <div class="p-4 text-white">
+        <h4 class="fw-bold"><i class="fas fa-landmark me-2"></i>E-Muni</h4>
+        <hr>
+    </div>
+    <ul class="nav flex-column">
+        <li><a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a></li>
+        <li><a th:href="@{/nouvelleDemande}" class="nav-link"><i class="fas fa-plus-circle me-2"></i> Nouvelle Demande</a></li>
+        <li><a th:href="@{/listeDemandes}" class="nav-link"><i class="fas fa-history me-2"></i> Mes Suivis</a></li>
+        <li><a th:href="@{/services}" class="nav-link"><i class="fas fa-concierge-bell me-2"></i> Services</a></li>
+        <li><a th:href="@{/bot/page}" class="nav-link"><i class="fas fa-concierge-bell me-2"></i> chatbot</a></li>
+        <li>
+            <a th:href="@{/mesResultats}" class="nav-link">
+                <i class="fas fa-check-double me-2"></i> Mes Résultats
+            </a>
+        </li>
+        <li class="mt-5"><a th:href="@{/logout}" class="nav-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+    </ul>
+</nav>
+</body>
+</html>

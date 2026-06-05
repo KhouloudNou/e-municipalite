@@ -1,0 +1,27 @@
+# Système
+../../
+.VirtualBox/
+.android/
+.vscode/
+.arduinoIDE/
+.ipython/
+.jupyter/
+.gradle/
+.m2/
+.cache/
+AppData/
+Documents/
+Downloads/
+*.packettracer
+*.angular-config.json
+
+# Java / Spring Boot
+target/
+.idea/
+*.class
+*.jar
+
+# Général
+*.db
+*.zip
+*.log

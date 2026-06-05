@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Services</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- ✅ NAVBAR AJOUTÉE ICI -->
+        <div th:replace="~{admin/navbar-admin :: navbar}"></div>
+
+        <!-- Contenu principal (exactement pareil qu'avant) -->
+        <div class="col py-4 px-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">
+                    <i class="bi bi-gear-fill me-2"></i>Gestion des Services
+                </h3>
+                <a th:href="@{/admin/services/nouveau}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>Nouveau Service
+                </a>
+            </div>
+
+            <!-- Barre de recherche -->
+            <form th:action="@{/admin/services/liste}" method="get" class="mb-4">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text"
+                           name="keyword"
+                           th:value="${keyword}"
+                           class="form-control border-start-0 ps-0"
+                           placeholder="Rechercher par nom ou description...">
+                    <button type="submit" class="btn btn-primary px-4">Rechercher</button>
+                    <a th:if="${keyword != null and !keyword.isEmpty()}"
+                       th:href="@{/admin/services/liste}"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </form>
+
+            <!-- Tableau -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Frais (DT)</th>
+                            <th>Documents Requis</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(services)}">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                                Aucun service trouvé.
+                            </td>
+                        </tr>
+                        <tr th:each="s : ${services}">
+                            <td th:text="${s.id}"></td>
+                            <td class="fw-semibold" th:text="${s.nom}"></td>
+                            <td class="text-muted" th:text="${s.description}"></td>
+                            <td>
+                                <span class="badge bg-success fs-6"
+                                      th:text="${s.frais} + ' DT'"></span>
+                            </td>
+                            <td>
+                                <small class="text-muted" th:text="${s.documentsRequis}"></small>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/admin/services/edit/{id}(id=${s.id})}"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a th:href="@{/admin/services/delete/{id}(id=${s.id})}"
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Supprimer ce service ?')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Infos résultats -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="text-muted">
+                    Page <strong th:text="${currentPage + 1}"></strong>
+                    sur <strong th:text="${totalPages == 0 ? 1 : totalPages}"></strong>
+                    &nbsp;|&nbsp;
+                    <strong th:text="${servicePage.totalElements}"></strong> résultat(s) trouvé(s)
+                </small>
+
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/admin/services/liste(keyword=${keyword}, page=${currentPage - 1}, size=5)}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item"
+                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/admin/services/liste(keyword=${keyword}, page=${i}, size=5)}"
+                               th:text="${i + 1}">
+                            </a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/admin/services/liste(keyword=${keyword}, page=${currentPage + 1}, size=5)}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

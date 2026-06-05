@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Demandes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; background: #212529; }
+        .nav-link { color: #adb5bd; padding: 15px 20px; }
+        .nav-link:hover, .nav-link.active { background: #343a40; color: #fff; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="d-flex">
+    <div th:replace="~{citoyen/navbar :: sidebar}"></div>
+
+    <div class="w-100">
+        <div class="container mt-5">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold"><i class="fas fa-list-alt me-2"></i> Mes Demandes</h4>
+                <a th:href="@{/nouvelleDemande}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Nouvelle demande
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <form th:action="@{/listeDemandes}" method="get" class="row g-2">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                                <input type="text" name="keyword" th:value="${keyword}"
+                                       class="form-control border-start-0"
+                                       placeholder="Rechercher par statut ">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-dark w-100">Chercher</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Service</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th>Date de dépôt</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${demandes}">
+                            <td th:text="${d.id}" class="fw-bold text-muted"></td>
+                            <td th:text="${d.service != null ? d.service.nom : 'N/A'}"></td>
+                            <td th:text="${#strings.abbreviate(d.description, 50)}"></td>
+                            <td>
+                        <span class="badge"
+                              th:classappend="${d.statut == 'En attente'} ? 'bg-warning text-dark' : 'bg-success'"
+                              th:text="${d.statut}">
+                        </span>
+                            </td>
+                            <td th:text="${#temporals.format(d.dateCreation, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <a th:href="@{/deleteDemande/{id}(id=${d.id})}"
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Supprimer cette demande ?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <a th:if="${d.statut != 'Acceptée'}"
+                                   th:href="@{/editDemande/{id}(id=${d.id})}"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(demandes)}">
+                            <td colspan="6" class="text-center py-4 text-muted">Aucune demande trouvée pour "[[${keyword}]]".</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <nav th:if="${totalPages > 1}" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/listeDemandes(page=${currentPage - 1}, keyword=${keyword})}">&laquo;</a>
+                    </li>
+
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/listeDemandes(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/listeDemandes(page=${currentPage + 1}, keyword=${keyword})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

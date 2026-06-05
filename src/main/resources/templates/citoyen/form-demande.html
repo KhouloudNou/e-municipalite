@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle Demande</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; background: #212529; }
+        .nav-link { color: #adb5bd; padding: 15px 20px; }
+        .nav-link:hover, .nav-link.active { background: #343a40; color: #fff; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="d-flex">
+    <div th:replace="~{citoyen/navbar :: sidebar}"></div>
+
+    <div class="w-100">
+        <div class="container mt-5 mb-5" style="max-width: 720px;">
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-dark text-white d-flex align-items-center gap-2">
+                    <i class="fas fa-file-alt"></i>
+                    <h5 class="mb-0" th:text="${demande.id == null ? 'Créer une nouvelle demande' : 'Modifier la demande'}">Créer une nouvelle demande</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form th:action="@{/saveDemande}"
+                          th:object="${demande}"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{statut}">
+                        <input type="hidden" th:field="*{dateCreation}">
+
+                        <h6 class="text-uppercase text-muted mb-3 border-bottom pb-2">
+                            <i class="fas fa-building me-1"></i> Service
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Service municipal</label>
+                            <select th:field="*{service.id}"
+                                    class="form-select"
+                                    id="serviceSelect"
+                                    onchange="afficherInfoService()"
+                                    required>
+                                <option value="">-- Choisir un service --</option>
+                                <option th:each="s : ${mesServices}"
+                                        th:value="${s.id}"
+                                        th:text="${s.nom}"
+                                        th:attr="data-frais=${s.frais},
+                                                 data-docs=${s.documentsRequis},
+                                                 data-desc=${s.description}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div id="infoService" class="card border-primary mb-4" style="display:none;">
+                            <div class="card-body py-3">
+                                <p class="mb-1">
+                                    <i class="fas fa-info-circle text-primary me-1"></i>
+                                    <strong>Description :</strong>
+                                    <span id="descService" class="text-muted"></span>
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-money-bill-wave text-success me-1"></i>
+                                    <strong>Frais :</strong>
+                                    <span id="fraisService" class="fw-bold text-success"></span> DT
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-paperclip text-warning me-1"></i>
+                                    <strong>Documents requis :</strong>
+                                    <span id="docsService" class="text-warning fw-semibold"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <h6 class="text-uppercase text-muted mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-user me-1"></i> Informations personnelles
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-7">
+                                <label class="form-label fw-semibold">Adresse actuelle</label>
+                                <input type="text"
+                                       th:field="*{adresse}"
+                                       class="form-control"
+                                       placeholder="Ex: 12 Rue de la Liberté, Tunis"
+                                       required>
+                                <small class="text-danger"
+                                       th:if="${#fields.hasErrors('adresse')}"
+                                       th:errors="*{adresse}">
+                                </small>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold">Date de naissance</label>
+                                <input type="date"
+                                       th:value="${demande.dateNaissance != null ? #temporals.format(demande.dateNaissance, 'yyyy-MM-dd') : ''}"
+                                       name="dateNaissance"
+                                       class="form-control"
+                                       required>
+                                <small class="text-danger"
+                                       th:if="${#fields.hasErrors('dateNaissance')}"
+                                       th:errors="*{dateNaissance}">
+                                </small>
+                            </div>
+                        </div>
+
+                        <h6 class="text-uppercase text-muted mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-pen me-1"></i> Votre demande
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea th:field="*{description}"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Expliquez votre demande à l'administration..."
+                                      required></textarea>
+                            <small class="text-danger"
+                                   th:if="${#fields.hasErrors('description')}"
+                                   th:errors="*{description}">
+                            </small>
+                        </div>
+
+                        <h6 class="text-uppercase text-muted mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-paperclip me-1"></i> Pièces jointes
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image text-primary me-1"></i> Image justificative
+                                </label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*">
+                                <small class="text-muted">Photo CIN, photo d'identité...</small>
+                                <div th:if="${demande.image != null}" class="mt-1">
+                                    <span class="text-success small"><i class="fas fa-check-circle"></i> Fichier actuel : <b th:text="${demande.image}"></b></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-file-pdf text-danger me-1"></i> Document PDF
+                                </label>
+                                <input type="file" name="pdfFile" class="form-control" accept=".pdf">
+                                <small class="text-muted">Acte de naissance, certificat...</small>
+                                <div th:if="${demande.documentPdf != null}" class="mt-1">
+                                    <span class="text-success small"><i class="fas fa-check-circle"></i> PDF actuel : <b th:text="${demande.documentPdf}"></b></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-paper-plane me-1"></i> Valider la demande
+                            </button>
+                            <a th:href="@{/listeDemandes}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function afficherInfoService() {
+        const select = document.getElementById('serviceSelect');
+        const option = select.options[select.selectedIndex];
+        if (!select.value) {
+            document.getElementById('infoService').style.display = 'none';
+            return;
+        }
+        document.getElementById('fraisService').textContent = option.getAttribute('data-frais') || '0';
+        document.getElementById('docsService').textContent  = option.getAttribute('data-docs')  || 'Aucun document spécifique';
+        document.getElementById('descService').textContent  = option.getAttribute('data-desc')  || '';
+        document.getElementById('infoService').style.display = 'block';
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if(document.getElementById('serviceSelect').value) {
+            afficherInfoService();
+        }
+    });
+</script>
+</body>
+</html>

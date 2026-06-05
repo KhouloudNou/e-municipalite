@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Finaliser la Demande | Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-recap { border-left: 5px solid #0d6efd; background-color: #f8f9fa; }
+        .img-preview { max-width: 150px; border-radius: 8px; border: 2px solid #dee2e6; padding: 5px; background: white; }
+        .form-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div th:replace="~{admin/navbar-admin :: navbar}"></div>
+
+        <div class="col py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+
+                        <div class="card card-recap mb-4 shadow-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h5 class="text-primary fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Détails de la Demande</h5>
+                                        <p class="mb-1"><strong>Citoyen :</strong> <span th:text="${demande.citoyen.nom}"></span></p>
+                                        <p class="mb-1"><strong>Service :</strong> <span th:text="${demande.service.nom}"></span></p>
+                                        <p class="mb-1"><strong>Date :</strong> <span th:text="${#temporals.format(demande.dateCreation, 'dd/MM/yyyy HH:mm')}"></span></p>
+                                        <p class="mb-0"><strong>Status :</strong> <span class="badge bg-info text-dark" th:text="${demande.statut}"></span></p>
+                                    </div>
+
+                                    <div class="col-md-4 text-center" th:if="${demande.image != null}">
+                                        <label class="d-block small fw-bold text-muted mb-2">Pièce Jointe (CIN)</label>
+                                        <img th:src="@{/display/{img}(img=${demande.image})}"
+                                             class="img-preview shadow-sm"
+                                             alt="Image non trouvée">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="fw-bold text-success mb-4">
+                                <i class="fas fa-file-upload me-2"></i> Envoyer le Résultat Officiel (PDF)
+                            </h4>
+
+                            <form th:action="@{/admin/demandes/save-resultat}"
+                                  th:object="${resultat}"
+                                  method="post"
+                                  enctype="multipart/form-data">
+
+                                <input type="hidden" name="demandeId" th:value="${demande.id}">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Référence du Document</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                            <input type="text" th:field="*{refrencePdf}" class="form-control"
+                                                   placeholder="Ex: REF-2026-TUN" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Document Final (PDF)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-file-pdf text-danger"></i></span>
+                                            <input type="file" name="file" class="form-control" accept="application/pdf" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Message d'accompagnement</label>
+                                    <textarea th:field="*{commentaireAdmin}" class="form-control" rows="3"
+                                              placeholder="Votre document est prêt..."></textarea>
+                                </div>
+
+                                <div class="d-flex justify-content-between border-top pt-4">
+                                    <a th:href="@{/admin/demandes/liste}" class="btn btn-outline-secondary px-4">
+                                        <i class="fas fa-times me-1"></i> Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">
+                                        <i class="fas fa-paper-plane me-2"></i> Envoyer au Citoyen
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

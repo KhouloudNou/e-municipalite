@@ -1,0 +1,39 @@
+<div th:fragment="navbar" class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark min-vh-100 shadow">
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-4 text-white">
+        <a th:href="@{/admin/dashboard}" class="d-flex align-items-center pb-3 mb-md-1 mt-md-3 me-md-auto text-white text-decoration-none">
+            <i class="fas fa-city fs-3 text-primary me-2"></i>
+            <span class="fs-5 d-none d-sm-inline fw-bold">E-Muni Admin</span>
+        </a>
+        <hr class="w-100">
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100">
+            <li class="nav-item w-100 mb-2">
+                <a th:href="@{/admin/dashboard}" class="nav-link align-middle px-3 text-white">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    <span class="ms-1 d-none d-sm-inline">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+                <a th:href="@{/admin/services/liste}" class="nav-link px-3 align-middle text-white">
+                    <i class="fas fa-list-ul me-2"></i>
+                    <span class="ms-1 d-none d-sm-inline">Services</span>
+                </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+                <a th:href="@{/admin/demandes/liste}" class="nav-link px-3 align-middle text-white">
+                    <i class="fas fa-file-invoice me-2"></i>
+                    <span class="ms-1 d-none d-sm-inline">Demandes</span>
+                </a>
+            </li>
+        </ul>
+        <hr class="w-100">
+        <div class="pb-4 w-100">
+            <div class="px-3 mb-3">
+                <small class="d-block text-muted">Connecté :</small>
+                <span class="d-none d-sm-inline text-truncate" th:text="${session.adminConnecte.nom}">Admin</span>
+            </div>
+            <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                <i class="fas fa-power-off me-2"></i> Déconnexion
+            </a>
+        </div>
+    </div>
+</div>
